@@ -1,0 +1,11 @@
+*.pdf
+*.gif
+*.mp4
+*.png
+*.jpg
+post
+build 
+*.o 
+*.obj
+*.a
+nbody
