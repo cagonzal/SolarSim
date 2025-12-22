@@ -129,8 +129,10 @@ for name in planet_names:
     max_dist = max(max_dist, np.max(np.sqrt(x**2 + y**2)))
 
 margin = 1.1
-ax.set_xlim(-max_dist * margin, max_dist * margin)
-ax.set_ylim(-max_dist * margin, max_dist * margin)
+# ax.set_xlim(-max_dist * margin, max_dist * margin)
+# ax.set_ylim(-max_dist * margin, max_dist * margin)
+ax.set_xlim(0, max_dist * margin)
+ax.set_ylim(0, max_dist * margin)
 ax.set_aspect('equal')
 ax.set_xlabel(r'$x$ (AU)', fontsize=12)
 ax.set_ylabel(r'$y$ (AU)', fontsize=12)
@@ -152,7 +154,7 @@ for i, name in enumerate(planet_names):
         trail_plots[name] = ax.plot([], [], '-', color=colors[i], 
                                     alpha=0.5)[0]
         planet_plots[name] = ax.plot([], [], 'o', color=colors[i], 
-                                      markersize=8, label=name.capitalize())[0]
+                                      markersize=6, label=name.capitalize())[0]
 
 # Time text
 time_text = ax.text(0.02, 0.98, '', transform=ax.transAxes, 
@@ -207,10 +209,10 @@ anim = animation.FuncAnimation(fig, animate, init_func=init,
 # Save animation
 print("Saving animation (this may take a minute)...") 
 
-# anim.save('solar_system.mp4', writer='ffmpeg', fps=30, dpi=150, bitrate=1800)
-anim.save('solar_system.gif', writer='pillow', fps=30, dpi=150, bitrate=1800)
-# print("Animation saved as 'solar_system.mp4'")
-print("Animation saved as 'solar_system.gif'")
+anim.save('solar_system.mp4', writer='ffmpeg', fps=30, dpi=150, bitrate=1800)
+print("Animation saved as 'solar_system.mp4'")
+# anim.save('solar_system.gif', writer='pillow', fps=30, dpi=150, bitrate=1800)
+# print("Animation saved as 'solar_system.gif'")
 
 # Also show it
 # plt.show()

@@ -8,4 +8,5 @@ build
 *.o 
 *.obj
 *.a
+*.dat
 nbody

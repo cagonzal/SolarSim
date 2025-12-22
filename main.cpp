@@ -15,32 +15,52 @@ int main() {
 
     std::vector<std::string> planets_to_simulate = {
         "sun",
-        "mercury",
+        // "mercury",
         "venus",
         "earth",
-        "mars",
-        "jupiter",
-        "neptune",
-        "uranus",
-        "neptune"
+        "moon",
+        "mars"
+        // "jupiter",
+        // "neptune",
+        // "uranus",
+        // "neptune"
     };
 
 
-    for (const auto& planet_name : planets_to_simulate) {
-        if (db.has_planet(planet_name)) {
-            Body body = db.create_body(planet_name);
-            sim.add_body(body, planet_name);
-            std::cout << "Added " << planet_name << std::endl;
+    // for (const auto& planet_name : planets_to_simulate) {
+    //     if (db.has_planet(planet_name)) {
+    //         Body body = db.create_body(planet_name);
+    //         sim.add_body(body, planet_name);
+    //         std::cout << "Added " << planet_name << std::endl;
+    //     }
+    //     else {
+    //         std::cerr << "Warning: Planet '" << planet_name << "' not found" << std::endl;
+    //     }
+    // }
+    std::map<std::string, Body> bodies_created;
+    
+    for (const auto& name : planets_to_simulate) {
+        if (!db.has_planet(name)) {
+            std::cerr << "Warning: Body '" << name << "' not found!" << std::endl;
+            continue;
         }
-        else {
-            std::cerr << "Warning: Planet '" << planet_name << "' not found" << std::endl;
+        
+        try {
+            Body body = db.create_body_hierarchical(name, bodies_created);
+            sim.add_body(body, name);
+            bodies_created[name] = body;
+            std::cout << "Added " << name << std::endl;
+        } catch (const std::exception& e) {
+            std::cerr << "Error adding " << name << ": " << e.what() << std::endl;
+            return 1;
         }
     }
 
     // sim params 
     double dt = 0.00001; // years 
-    double t_end = 2.5;
-    int output_interval = 1000; 
+    // double t_end = 2.5;
+    double t_end = 1.0;
+    int output_interval = 100; 
 
     double E0 = sim.total_energy(); // initial energy 
     std::cout << "Initial energy: " << E0 << std::endl;
