@@ -15,10 +15,10 @@ int main() {
 
     std::vector<std::string> planets_to_simulate = {
         "sun",
-        // "mercury",
+        "mercury",
         "venus",
         "earth",
-        "moon",
+        // "moon",
         "mars"
         // "jupiter",
         // "neptune",

@@ -129,10 +129,10 @@ for name in planet_names:
     max_dist = max(max_dist, np.max(np.sqrt(x**2 + y**2)))
 
 margin = 1.1
-# ax.set_xlim(-max_dist * margin, max_dist * margin)
-# ax.set_ylim(-max_dist * margin, max_dist * margin)
-ax.set_xlim(0, max_dist * margin)
-ax.set_ylim(0, max_dist * margin)
+ax.set_xlim(-max_dist * margin, max_dist * margin)
+ax.set_ylim(-max_dist * margin, max_dist * margin)
+# ax.set_xlim(0, max_dist * margin)
+# ax.set_ylim(0, max_dist * margin)
 ax.set_aspect('equal')
 ax.set_xlabel(r'$x$ (AU)', fontsize=12)
 ax.set_ylabel(r'$y$ (AU)', fontsize=12)
@@ -159,7 +159,7 @@ for i, name in enumerate(planet_names):
 # Time text
 time_text = ax.text(0.02, 0.98, '', transform=ax.transAxes, 
                     fontsize=14, verticalalignment='top',
-                    bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+                    bbox=dict(boxstyle='round', facecolor='gold', alpha=0.8))
 
 ax.legend(loc='upper right', fontsize=10)
 
