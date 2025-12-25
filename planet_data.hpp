@@ -22,7 +22,8 @@ class PlanetDatabase {
 
     public:
         PlanetDatabase() {
-            planets["sun"] = {"Sun", 1.0, 1.0, 0.0};
+            // name, M / M_sun, mean distance from parent body, eccentricity
+            planets["sun"] = {"Sun", 1.0, 0.0, 0.0};
 
             planets["mercury"] = {"Mercury", 1.66e-7, 0.387, 0.206, "sun"};
             planets["venus"] = {"Venus", 2.45e-6, 0.723, 0.007, "sun"};
@@ -34,6 +35,11 @@ class PlanetDatabase {
             planets["saturn"] = {"Saturn", 2.86e-4, 9.537, 0.054, "sun"};
             planets["uranus"] = {"Uranus", 4.37e-5, 19.191, 0.047, "sun"};
             planets["neptune"] = {"Neptune", 5.15e-5, 30.069, 0.009, "sun"};
+
+            // set mass to machine precision -> exert no influence on the earth 
+            // distance is set to a high earth orbit 
+            // ciruclar so eccentricity is zero 
+            planets["satellite"] = {"Mars Reconnaissance Orbiter", 1e-15, 2.392e-4, 0.0, "earth"}; 
         }
 
         bool has_planet(const std::string& name) const {
