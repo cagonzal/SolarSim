@@ -6,6 +6,7 @@ import seaborn as sns
 sns.set_context("paper")
 sns.set_theme(style='dark')
 from cycler import cycler
+from scipy.interpolate import CubicSpline
 
 colors = ['xkcd:sea blue', 'xkcd:brick', 'xkcd:teal green', 'xkcd:salmon',
           'xkcd:soft purple', 'xkcd:turquoise', 'xkcd:gold', 'xkcd:cornflower',
@@ -119,6 +120,18 @@ for i, name in enumerate(planet_names):
     y = data[:, 2 + 2*i]
     positions[name] = (x, y)
 
+cs_x = CubicSpline(time, positions['satellite'][0])
+cs_y = CubicSpline(time, positions['satellite'][1])
+
+t_fine = np.linspace(time[0], time[-1], 2 * np.size(time))
+x_fine = cs_x(t_fine)
+y_fine = cs_y(t_fine)
+
+# print(f"x = {positions['satellite'][0]}")
+# print(f"y = {positions['satellite'][1]}")
+# print(f"xfine = {x_fine}")
+# print(f"yfine = {y_fine}")
+
 # Set up the figure
 fig, ax = plt.subplots(figsize=(10, 10), facecolor='black', dpi=300)
 
@@ -130,10 +143,10 @@ for name in planet_names:
 
 earth_name = 'earth'
 margin = 1.1
-R_min = 0.01 #AU ~ moon orbit scale 
+R_min = 0.004 #AU ~ moon orbit scale 
 R_max = max_dist * margin
 zoom_start = 0.0 
-zoom_duration = time[-1]/1.1
+zoom_duration = time[-1]
 
 def smooth_step(t):
     return t * t * (3 - 2 * 2)
@@ -198,7 +211,8 @@ def animate(frame):
         s = (t - zoom_start) / zoom_duration
     # s = smooth_step(s)
 
-    R = R_min + s * (R_max - R_min)
+    # R = R_min + s * (R_max - R_min)
+    R = R_min
 
     xmin, xmax = sorted((cx - R, cx + R))
     ymin, ymax = sorted((cy - R, cy + R))
@@ -240,7 +254,7 @@ frames_to_use = range(0, n_frames, frame_skip)
 #                                blit=True, repeat=True)
 anim = animation.FuncAnimation(fig, animate, init_func=init,
                                frames=frames_to_use, 
-                               interval=20,  # 20ms between frames = 50 fps
+                               interval=200,  # 20ms between frames = 50 fps
                                blit=True, repeat=True)
 
 # Save animation

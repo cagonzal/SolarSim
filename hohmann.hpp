@@ -66,6 +66,8 @@ class HohmannTransfer {
             r1 = radius1; 
             r2 = radius2;
             mu_central = G * central_body_mass;
+            std::cout << "radius1 " << r1 << std::endl;
+            std::cout << "radius2 " << r2 << std::endl;
             is_interplanetary = false;
             planning_time = current_time; 
 
@@ -76,6 +78,8 @@ class HohmannTransfer {
             // Velocities in circular orbits
             double v1_circular = std::sqrt(mu_central / r1);
             double v2_circular = std::sqrt(mu_central / r2);
+
+            std::cout << "V_circ from formula = " << v1_circular << std::endl;
 
             // Velocities on transfer orbit at periapsis and apoapsis
             double v1_transfer = std::sqrt(mu_central * (2.0/r1 - 1.0/a_transfer));
@@ -168,7 +172,7 @@ class HohmannTransfer {
             return phase_error < tolerance;
         }
 
-        bool update(Body& satellite, const Body* target_body, double current_time) {
+        bool update(Body& satellite, const Body& earth, const Body* target_body, double current_time) {
             double time_since_departure = current_time - departure_time;
 
             switch(state) {
@@ -196,16 +200,31 @@ class HohmannTransfer {
                     return false;
                 }
                 case BURN1_READY: {
-                    Vector3 velocity_dir = satellite.velocity.normalized();
+
+                    Vector3 r_rel = satellite.position - earth.position;
+                    Vector3 v_rel = satellite.velocity - earth.velocity;
 
                     // Calculate required delta-v
-                    double v_circular = satellite.velocity.magnitude();
+                    // double v_circular = satellite.velocity.magnitude();
+
+                    // double v_circular = sqrt(mu_central / r_rel.magnitude());
+                    // double v_circular = std::sqrt(mu_central / r1);
+
+                    double v_circular = sqrt(mu_central / r1);
+                    Vector3 r_hat = r_rel.normalized();
+                    Vector3 v_tan = v_rel - v_rel.dot(r_hat) * r_hat;
+                    Vector3 v_tan_hat = v_tan.normalized();
+
                     double a_transfer = (r1 + r2) / 2.0;
-                    double v_transfer = std::sqrt(mu_central * (2.0/r1 - 1.0/a_transfer));
+                    double v_transfer = std::sqrt(mu_central * (2.0 / r1 - 1.0 / a_transfer));
                     double dv1_mag = v_transfer - v_circular;
 
-                    delta_v1 = velocity_dir * dv1_mag;
-                    satellite.velocity += delta_v1;
+                    // double eccentricity = (r2 - r1) / (r2 + r1);
+
+                    delta_v1 = v_tan_hat * dv1_mag;
+                    // satellite.velocity += delta_v1;
+                    v_rel += delta_v1;
+                    satellite.velocity = v_rel + earth.velocity;
 
                     state = COASTING;
 
@@ -219,24 +238,43 @@ class HohmannTransfer {
 
                 case COASTING: {
                     // Check if we've reached apoapsis (for outer transfer) or periapsis (for inner)
-                    if (time_since_departure >= transfer_time - 1e-6) {
+                    Vector3 r_rel = satellite.position - earth.position; 
+                    Vector3 v_rel = satellite.velocity - earth.velocity;
+                    double v_radial = r_rel.dot(v_rel);
+                    double eps = 1e-6;
+                    // at apogee, v_radial = 0 
+                    // if (time_since_departure >= transfer_time - 1e-6) {
+                    if (time_since_departure >= transfer_time * 0.9 && std::abs(v_radial) < eps) {
                         state = BURN2_READY;
                         std::cout << "\nt = " << current_time 
                             << " | Reached target orbit altitude" << std::endl;
-                        std::cout << "Current radius: " << satellite.position.magnitude() 
+                        std::cout << "Current radius: " << (satellite.position - earth.position).magnitude()
                             << " AU (target: " << r2 << " AU)" << std::endl;
                     }
                     return false;
                 }
 
                 case BURN2_READY: {
-                    Vector3 velocity_dir = satellite.velocity.normalized();
-                    double v_transfer = satellite.velocity.magnitude();
-                    double v_circular = std::sqrt(mu_central / r2);
+
+                    Vector3 r_rel = satellite.position - earth.position;
+                    Vector3 v_rel = satellite.velocity - earth.velocity;
+
+                    double v_circular = sqrt(mu_central / r2);
+                    Vector3 r_hat = r_rel.normalized();
+                    Vector3 v_tan = v_rel - v_rel.dot(r_hat) * r_hat;
+                    Vector3 v_tan_hat = v_tan.normalized();
+
+                    double a_transfer = (r1 + r2) / 2.0;
+                    double v_transfer = std::sqrt(mu_central * (2.0 / r2 - 1.0 / a_transfer));
+
                     double dv2_mag = v_circular - v_transfer;
 
-                    delta_v2 = velocity_dir * dv2_mag;
-                    satellite.velocity += delta_v2;
+                    delta_v2 = v_tan_hat * dv2_mag;
+                    // satellite.velocity += delta_v1;
+                    v_rel += delta_v2;
+                    satellite.velocity = v_rel + earth.velocity;
+                    // this should be zero if properly burning at apogee
+                    // std::cout << "v_radial at burn2 = " << r_rel.dot(v_rel) << "\n";
 
                     state = COMPLETE;
 
@@ -266,3 +304,4 @@ class HohmannTransfer {
 
 };
 
+#endif
