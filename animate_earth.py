@@ -8,8 +8,8 @@ sns.set_theme(style='dark')
 from cycler import cycler
 from scipy.interpolate import CubicSpline
 
-colors = ['xkcd:sea blue', 'xkcd:brick', 'xkcd:teal green', 'xkcd:salmon',
-          'xkcd:soft purple', 'xkcd:turquoise', 'xkcd:gold', 'xkcd:cornflower',
+colors = ['xkcd:brick', 'xkcd:teal green', 'xkcd:salmon',
+          'xkcd:soft purple', 'xkcd:turquoise', 'xkcd:cornflower',
           'xkcd:dark cyan', 'xkcd:terra cotta', 'xkcd:forest', 'xkcd:coral pink',
           'xkcd:plum', 'xkcd:azure', 'xkcd:bronze', 'xkcd:periwinkle']
 
@@ -169,14 +169,24 @@ trail_length = 10  # Number of previous positions to show
 for i, name in enumerate(planet_names):
     if name.lower() == 'sun':
         # Sun: large yellow circle, no trail
-        planet_plots[name] = ax.plot([], [], 'o', color='gold', 
+        planet_plots[name] = ax.plot([], [], 'o', color='xkcd:gold', 
                                       markersize=15, label='Sun')[0]
+    elif name.lower() == "earth":
+        trail_plots[name] = ax.plot([], [], '-', color='xkcd:sea blue', 
+                                    alpha=0.5)[0]
+        planet_plots[name] = ax.plot([], [], 'o', color='xkcd:sea blue',
+                                     markersize=6, label='Earth')[0]
+    elif name.lower() == "moon":
+        trail_plots[name] = ax.plot([], [], '-', color='xkcd:silver', 
+                                    alpha=0.5)[0]
+        planet_plots[name] = ax.plot([], [], 'o', color='xkcd:silver',
+                                     markersize=6, label='Earth')[0]
     else:
         # Planet: smaller circle with trail
         trail_plots[name] = ax.plot([], [], '-', color=colors[i], 
                                     alpha=0.5)[0]
         planet_plots[name] = ax.plot([], [], 'o', color=colors[i], 
-                                      markersize=6, label=name.capitalize())[0]
+                                      markersize=4, label=name.capitalize())[0]
 
 # Time text
 time_text = ax.text(0.02, 0.98, '', transform=ax.transAxes, 
